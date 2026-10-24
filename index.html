@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="uz" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usmonjonov Nozimjon — Senior Frontend Architect</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            black: '#030712',
+                            darkcard: '#0B0F19',
+                            cyan: '#00F0FF',
+                            pink: '#FF0055',
+                            purple: '#A855F7',
+                            green: '#00FF66',
+                            yellow: '#FFCC00',
+                            lightbg: '#E2E8F0',
+                            lightcard: '#FFFFFF'
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+                        orbitron: ['Orbitron', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Hide Default Cursor on PC */
+        @media (pointer: fine) {
+            body, button, a, input {
+                cursor: none !important;
+            }
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .glow-cyan { text-shadow: 0 0 12px rgba(0, 240, 255, 0.8); }
+        .glow-pink { text-shadow: 0 0 12px rgba(255, 0, 85, 0.8); }
+        .box-glow-cyan { box-shadow: 0 0 20px rgba(0, 240, 255, 0.3); }
+        .box-glow-pink { box-shadow: 0 0 20px rgba(255, 0, 85, 0.3); }
+        
+        .dark .bg-cyber-grid {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+        }
+        .light .bg-cyber-grid {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(15, 23, 42, 0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(15, 23, 42, 0.08) 1px, transparent 1px);
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+        .glitch-hover:hover {
+            animation: glitch 0.2s infinite;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: #00F0FF; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-cyber-black text-slate-200 bg-cyber-grid min-h-screen relative overflow-x-hidden selection:bg-cyber-cyan selection:text-black">
+
+    <!-- CUSTOM DUMALOQ CURSOR ELEMENTLARI -->
+    <div id="cursor-dot" class="fixed top-0 left-0 w-2.5 h-2.5 bg-cyber-cyan rounded-full pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2 transition-transform duration-75 ease-out shadow-[0_0_10px_#00F0FF]"></div>
+    <div id="cursor-ring" class="fixed top-0 left-0 w-9 h-9 border-2 border-cyber-pink rounded-full pointer-events-none z-[9998] -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ease-out opacity-80 shadow-[0_0_15px_#FF0055]"></div>
+
+    <!-- 2 SECONDS LOADER -->
+    <div id="loader" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center font-mono transition-opacity duration-500">
+        <div class="w-80 space-y-4 text-center">
+            <div class="text-cyber-cyan text-xl font-orbitron font-black tracking-widest animate-pulse">
+                &lt;CARTOON_CYBER_WORLD/&gt;
+            </div>
+            <div class="text-xs text-cyber-pink tracking-widest font-bold" id="loader-status">
+                LOADING MULTI-LANG SYSTEM... 0%
+            </div>
+            <div class="w-full bg-slate-900 border border-cyber-cyan/30 h-2.5 rounded-full overflow-hidden p-0.5">
+                <div id="loader-bar" class="bg-gradient-to-r from-cyber-cyan via-cyber-purple to-cyber-pink h-full w-0 transition-all duration-75"></div>
+            </div>
+            <p class="text-[10px] text-slate-500 font-mono">Usmonjonov Nozimjon Portfolio Engine v8.0</p>
+        </div>
+    </div>
+
+    <!-- Cartoon & Cyber Canvas Background -->
+    <canvas id="bg-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-0 opacity-60"></canvas>
+
+    <!-- Header Navigation -->
+    <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b border-cyber-cyan/20 transition-colors duration-300 dark:bg-cyber-black/80 bg-slate-200/90 shadow-md">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-3 h-3 rounded-full bg-cyber-cyan animate-ping"></div>
+                <span class="font-orbitron font-bold text-lg sm:text-xl tracking-wider dark:text-white text-slate-900">
+                    NOZIMJON<span class="text-cyber-pink">.DEV</span>
+                </span>
+            </div>
+            
+            <nav class="hidden md:flex items-center gap-8 text-xs font-bold tracking-widest">
+                <a href="#about" class="hover:text-cyber-cyan transition-colors flex items-center gap-1 dark:text-slate-300 text-slate-800">
+                    <i data-lucide="user" class="w-4 h-4 text-cyber-cyan"></i> <span data-i18n="nav_about">SHAXS</span>
+                </a>
+                <a href="#skills" class="hover:text-cyber-cyan transition-colors flex items-center gap-1 dark:text-slate-300 text-slate-800">
+                    <i data-lucide="cpu" class="w-4 h-4 text-cyber-pink"></i> <span data-i18n="nav_skills">STEK</span>
+                </a>
+                <a href="#projects" class="hover:text-cyber-cyan transition-colors flex items-center gap-1 dark:text-slate-300 text-slate-800">
+                    <i data-lucide="layers" class="w-4 h-4 text-cyber-cyan"></i> <span data-i18n="nav_projects">LOYIHALAR</span>
+                </a>
+                <a href="#terminal" class="hover:text-cyber-cyan transition-colors flex items-center gap-1 dark:text-slate-300 text-slate-800">
+                    <i data-lucide="terminal" class="w-4 h-4 text-cyber-green"></i> <span data-i18n="nav_terminal">TERMINAL</span>
+                </a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <!-- Language Switcher Buttons -->
+                <div class="flex items-center border border-slate-700 rounded p-0.5 bg-black/40 text-[11px] font-bold">
+                    <button onclick="setLanguage('uz')" id="btn-uz" class="px-2 py-1 rounded bg-cyber-cyan text-black">UZ</button>
+                    <button onclick="setLanguage('ru')" id="btn-ru" class="px-2 py-1 rounded text-slate-400 hover:text-white">RU</button>
+                    <button onclick="setLanguage('en')" id="btn-en" class="px-2 py-1 rounded text-slate-400 hover:text-white">EN</button>
+                </div>
+
+                <!-- Theme Toggle Button -->
+                <button id="theme-toggle" onclick="toggleTheme()" class="px-3 py-1.5 border border-cyber-pink text-cyber-pink hover:bg-cyber-pink hover:text-white transition-all text-xs font-bold rounded flex items-center gap-1.5">
+                    <i data-lucide="sun" id="theme-icon" class="w-4 h-4"></i>
+                    <span id="theme-text">KUNGI</span>
+                </button>
+
+                <!-- GitHub Link -->
+                <a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="hidden sm:flex px-3 py-1.5 border border-cyber-cyan text-cyber-cyan hover:bg-cyber-cyan hover:text-black font-bold text-xs transition-all box-glow-cyan rounded items-center gap-1.5">
+                    <i data-lucide="github" class="w-4 h-4"></i>
+                    <span>GITHUB</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10 pt-28 px-6 max-w-7xl mx-auto space-y-32">
+
+        <!-- HERO SECTION -->
+        <section id="about" class="min-h-[85vh] flex flex-col justify-center items-start relative">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyber-cyan/30 bg-cyber-cyan/10 text-cyber-cyan text-xs font-mono mb-6">
+                <span class="w-2 h-2 rounded-full bg-cyber-green animate-pulse"></span> <span data-i18n="hero_badge">USMONJONOV NOZIMJON // BORN 2015</span>
+            </div>
+            
+            <h1 class="text-4xl sm:text-6xl md:text-7xl font-orbitron font-black dark:text-white text-slate-900 tracking-tight leading-none mb-6">
+                USMONJONOV <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyber-cyan via-cyber-purple to-cyber-pink glow-cyan">
+                    NOZIMJON
+                </span>
+            </h1>
+            
+            <p data-i18n="hero_desc" class="dark:text-slate-400 text-slate-700 text-lg md:text-xl max-w-2xl font-normal mb-8 leading-relaxed">
+                Frontend Senior Architect. Next.js 14, React.js, TypeScript hamda Tailwind CSS orqali murakkab, tezkor va yuqori unumdorlikka ega tizimlarni yarataman.
+            </p>
+
+            <!-- Quick Bio Metrics -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-10 w-full max-w-xl">
+                <div class="p-3 border border-slate-700 dark:bg-cyber-darkcard/50 bg-white/80 rounded backdrop-blur shadow-sm">
+                    <div class="text-xs dark:text-slate-400 text-slate-600" data-i18n="metric_birth_label">Tug'ilgan yili:</div>
+                    <div class="text-lg font-bold text-cyber-cyan font-orbitron" data-i18n="metric_birth_value">2015-yil</div>
+                </div>
+                <div class="p-3 border border-slate-700 dark:bg-cyber-darkcard/50 bg-white/80 rounded backdrop-blur shadow-sm">
+                    <div class="text-xs dark:text-slate-400 text-slate-600" data-i18n="metric_role_label">Mutaxassislik:</div>
+                    <div class="text-lg font-bold text-cyber-pink font-orbitron">Senior Frontend</div>
+                </div>
+                <div class="p-3 border border-slate-700 dark:bg-cyber-darkcard/50 bg-white/80 rounded col-span-2 sm:col-span-1 backdrop-blur shadow-sm">
+                    <div class="text-xs dark:text-slate-400 text-slate-600" data-i18n="metric_stack_label">Asosiy Stek:</div>
+                    <div class="text-lg font-bold text-cyber-green font-orbitron">Next.js / TS</div>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-4">
+                <a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="px-8 py-4 bg-cyber-cyan text-black font-orbitron font-bold text-sm tracking-wider uppercase hover:bg-white transition-all box-glow-cyan flex items-center gap-2 glitch-hover">
+                    <i data-lucide="github" class="w-5 h-5"></i> <span data-i18n="btn_github">GitHub Profilim</span>
+                </a>
+                <a href="#projects" class="px-8 py-4 border border-slate-700 dark:bg-cyber-darkcard bg-white hover:border-cyber-pink dark:text-white text-slate-900 font-orbitron font-bold text-sm tracking-wider uppercase transition-all flex items-center gap-2 shadow-sm">
+                    <i data-lucide="folder-code"></i> <span data-i18n="btn_projects">Loyihalarni Ko'rish</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- TECH STACK SECTION -->
+        <section id="skills" class="space-y-10">
+            <div>
+                <h2 class="text-3xl font-orbitron font-bold dark:text-white text-slate-900 flex items-center gap-3">
+                    <span class="text-cyber-pink">//</span> <span data-i18n="skills_title">TEXNOLOGIK STEK</span>
+                </h2>
+                <p class="dark:text-slate-400 text-slate-600 text-sm mt-2" data-i18n="skills_subtitle">Mukammal egallangan va loyihalarda qo'llanilgan asosiy qurollarim</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="p-5 dark:bg-cyber-darkcard/90 bg-white border border-slate-700 dark:border-slate-800 hover:border-cyber-cyan transition-all rounded hover:-translate-y-1 backdrop-blur shadow-sm">
+                    <div class="text-cyber-cyan text-3xl font-bold font-orbitron mb-2">01</div>
+                    <h3 class="text-lg font-bold dark:text-white text-slate-900 mb-1">Next.js 14</h3>
+                    <p class="text-xs dark:text-slate-400 text-slate-600">App Router, SSR, Server Actions, Dynamic Routes</p>
+                </div>
+                <div class="p-5 dark:bg-cyber-darkcard/90 bg-white border border-slate-700 dark:border-slate-800 hover:border-cyber-pink transition-all rounded hover:-translate-y-1 backdrop-blur shadow-sm">
+                    <div class="text-cyber-pink text-3xl font-bold font-orbitron mb-2">02</div>
+                    <h3 class="text-lg font-bold dark:text-white text-slate-900 mb-1">React.js</h3>
+                    <p class="text-xs dark:text-slate-400 text-slate-600">Custom Hooks, Redux Toolkit, Context API, Query</p>
+                </div>
+                <div class="p-5 dark:bg-cyber-darkcard/90 bg-white border border-slate-700 dark:border-slate-800 hover:border-cyber-purple transition-all rounded hover:-translate-y-1 backdrop-blur shadow-sm">
+                    <div class="text-cyber-purple text-3xl font-bold font-orbitron mb-2">03</div>
+                    <h3 class="text-lg font-bold dark:text-white text-slate-900 mb-1">TypeScript</h3>
+                    <p class="text-xs dark:text-slate-400 text-slate-600">Strict Typing, Generics, Interfaces, Custom Types</p>
+                </div>
+                <div class="p-5 dark:bg-cyber-darkcard/90 bg-white border border-slate-700 dark:border-slate-800 hover:border-cyber-green transition-all rounded hover:-translate-y-1 backdrop-blur shadow-sm">
+                    <div class="text-cyber-green text-3xl font-bold font-orbitron mb-2">04</div>
+                    <h3 class="text-lg font-bold dark:text-white text-slate-900 mb-1">Tailwind CSS</h3>
+                    <p class="text-xs dark:text-slate-400 text-slate-600">Custom UI Components, Responsive Design, Grid</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROJECTS SECTION -->
+        <section id="projects" class="space-y-12">
+            <div>
+                <h2 class="text-3xl font-orbitron font-bold dark:text-white text-slate-900 flex items-center gap-3">
+                    <span class="text-cyber-cyan">//</span> <span data-i18n="projects_title">YARATILGAN TIZIMLAR va LOYIHALAR</span>
+                </h2>
+                <p class="dark:text-slate-400 text-slate-600 text-sm mt-2" data-i18n="projects_subtitle">Noldan boshlab yuqori darajada qurilgan 5 ta mualliflik platformasi</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- CRM -->
+                <div class="dark:bg-cyber-darkcard/90 bg-white border border-slate-700 dark:border-slate-800 hover:border-cyber-cyan transition-all rounded flex flex-col justify-between overflow-hidden group backdrop-blur shadow-sm">
+                    <div class="p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-cyber-cyan font-mono px-2 py-1 bg-cyber-cyan/10 border border-cyber-cyan/30 rounded">CRM Matrix</span>
+                            <i data-lucide="layout-dashboard" class="text-cyber-cyan"></i>
+                        </div>
+                        <h3 class="text-xl font-orbitron font-bold dark:text-white text-slate-900 group-hover:text-cyber-cyan transition-colors" data-i18n="p1_name">NEXUS CRM Tizimi</h3>
+                        <p class="dark:text-slate-400 text-slate-600 text-xs leading-relaxed" data-i18n="p1_desc">
+                            Biznes jarayonlarini avtomatlashtirish, analitika va mijozlar oqimini boshqaruvchi murakkab platforma.
+                        </p>
+                        <div class="flex flex-wrap gap-1.5 pt-2">
+                            <span class="text-[10px] bg-slate-800 text-slate-200 border border-slate-700 px-2 py-0.5">Next.js 14</span>
+                            <span class="text-[10px] bg-slate-800 text-slate-200 border border-slate-700 px-2 py-0.5">TypeScript</span>
+                            <span class="text-[10px] bg-slate-800 text-slate-200 border border-slate-700 px-2 py-0.5">Tailwind CSS</span>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0">
+                        <button onclick="openModal('crm')" class="w-full py-2 bg-slate-900 hover:bg-cyber-cyan hover:text-black text-slate-200 text-xs font-bold uppercase transition-all border border-slate-700" data-i18n="btn_details">
+                            Batafsil / Metrikalar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Football Booking -->
+                <div class="dark:bg-cyber-darkcard/90 bg-white border border-slate-700 dark:border-slate-800 hover:border-cyber-green transition-all rounded flex flex-col justify-between overflow-hidden group backdrop-blur shadow-sm">
+                    <div class="p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-cyber-green font-mono px-2 py-1 bg-cyber-green/10 border border-cyber-green/30 rounded">Real-Time</span>
+                            <i data-lucide="trophy" class="text-cyber-green"></i>
+                        </div>
+                        <h3 class="text-xl font-orbitron font-bold dark:text-white text-slate-900 group-hover:text-cyber-green transition-colors" data-i18n="p2_name">Football Booking Service</h3>
+                        <p class="dark:text-slate-400 text-slate-600 text-xs leading-relaxed" data-i18n="p2_desc">
+                            Futbol maydonlarini real vaqt rejimida bron qilish, onlayn vaqt va jadval tanlash servisi.
+                        </p>
+                        <div class="flex flex-wrap gap-1.5 pt-2">
+                            <span class="text-[10px] bg-slate-800 text-slate-200 border border-slate-700 px-2 py-0.5">React.js</span>
+                            <span class="text-[10px] bg-slate-800 text-slate-200 border border-slate-700 px-2 py-0.5">TypeScript</span>
+                            <span class="text-[10px] bg-slate-800 text-slate-200 border border-slate-700 px-2 py-0.5">Tailwind CSS</span>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0">
+                        <button onclick="openModal('football')" class="w-full py-2 bg-slate-900 hover:bg-cyber-green hover:text-black text-slate-200 text-xs font-bold uppercase transition-all border border-slate-700" data-i18n="btn_details">
+                            Batafsil / Metrikalar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hotel Booking -->
+                <div class="dark:bg-cyber-darkcard/90 bg-white border border-slate-700 dark:border-slate-800 hover:border-cyber-pink transition-all rounded flex flex-col justify-between overflow-hidden group backdrop-blur shadow-sm">
+                    <div class="p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-cyber-pink font-mono px-2 py-1 bg-cyber-pink/10 border border-cyber-pink/30 rounded">E-Commerce</span>
+                            <i data-lucide="building" class="text-cyber-pink"></i>
+                        </div>
+                        <h3 class="text-xl font-orbitron font-bold dark:text-white text-slate-900 group-hover:text-cyber-pink transition-colors" data-i18n="p3_name">Hotel Booking Service</h3>
+                        <p class="dark:text-slate-400 text-slate-600 text-xs leading-relaxed" data-i18n="p3_desc">
+                            Mehmonxona va xonalarni bron qilish hamda dinamik filtratsiya tizimiga ega interaktiv ilova.
+                        </p>
+                        <div class="flex flex-wrap gap-1.5 pt-2">
+                            <span class="text-[10px] bg-slate-800 text-slate-200 border border-slate-700 px-2 py-0.5">Next.js 14</span>
+                            <span class="text-[10px] bg-slate-800 text-slate-200 border border-slate-700 px-2 py-0.5">TypeScript</span>
+                            <span class="text-[10px] bg-slate-800 text-slate-200 border border-slate-700 px-2 py-0.5">Tailwind CSS</span>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0">
+                        <button onclick="openModal('hotel')" class="w-full py-2 bg-slate-900 hover:bg-cyber-pink hover:text-black text-slate-200 text-xs font-bold uppercase transition-all border border-slate-700" data-i18n="btn_details">
+                            Batafsil / Metrikalar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Car Rental -->
+                <div class="dark:bg-cyber-darkcard/90 bg-white border border-slate-700 dark:border-slate-800 hover:border-cyber-purple transition-all rounded flex flex-col justify-between overflow-hidden group backdrop-blur shadow-sm">
+                    <div class="p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-cyber-purple font-mono px-2 py-1 bg-cyber-purple/10 border border-cyber-purple/30 rounded">Automation</span>
+                            <i data-lucide="car" class="text-cyber-purple"></i>
+                        </div>
+                        <h3 class="text-xl font-orbitron font-bold dark:text-white text-slate-900 group-hover:text-cyber-purple transition-colors" data-i18n="p4_name">Car Rental Service</h3>
+                        <p class="dark:text-slate-400 text-slate-600 text-xs leading-relaxed" data-i18n="p4_desc">
+                            Avtomobillarni ijaraga berish, avtoparkni va tariflarni boshqaruvchi tezkor sistema.
+                        </p>
+                        <div class="flex flex-wrap gap-1.5 pt-2">
+                            <span class="text-[10px] bg-slate-800 text-slate-200 border border-slate-700 px-2 py-0.5">React.js</span>
+                            <span class="text-[10px] bg-slate-800 text-slate-200 border border-slate-700 px-2 py-0.5">TypeScript</span>
+                            <span class="text-[10px] bg-slate-800 text-slate-200 border border-slate-700 px-2 py-0.5">Tailwind CSS</span>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0">
+                        <button onclick="openModal('car')" class="w-full py-2 bg-slate-900 hover:bg-cyber-purple hover:text-black text-slate-200 text-xs font-bold uppercase transition-all border border-slate-700" data-i18n="btn_details">
+                            Batafsil / Metrikalar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Language Center / Al-Farg'oniy -->
+                <div class="dark:bg-cyber-darkcard/90 bg-white border border-slate-700 dark:border-slate-800 hover:border-cyber-cyan transition-all rounded flex flex-col justify-between overflow-hidden group backdrop-blur shadow-sm">
+                    <div class="p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-cyber-cyan font-mono px-2 py-1 bg-cyber-cyan/10 border border-cyber-cyan/30 rounded">EdTech / Al-Farg'oniy</span>
+                            <i data-lucide="graduation-cap" class="text-cyber-cyan"></i>
+                        </div>
+                        <h3 class="text-xl font-orbitron font-bold dark:text-white text-slate-900 group-hover:text-cyber-cyan transition-colors" data-i18n="p5_name">Al-Farg'oniy Language Center</h3>
+                        <p class="dark:text-slate-400 text-slate-600 text-xs leading-relaxed" data-i18n="p5_desc">
+                            O'quv markazlari uchun talabalar davomati, guruhlar hamda imtihonlarni nazorat qiluvchi LMS va rasmiy portal.
+                        </p>
+                        <div class="flex flex-wrap gap-1.5 pt-2">
+                            <span class="text-[10px] bg-slate-800 text-slate-200 border border-slate-700 px-2 py-0.5">Next.js 14</span>
+                            <span class="text-[10px] bg-slate-800 text-slate-200 border border-slate-700 px-2 py-0.5">TypeScript</span>
+                            <span class="text-[10px] bg-slate-800 text-slate-200 border border-slate-700 px-2 py-0.5">Tailwind CSS</span>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0 flex gap-2">
+                        <a href="./Al-Farg'oniy/index.html" target="_blank" class="w-full py-2 bg-cyber-cyan hover:bg-white text-black text-center text-xs font-bold uppercase transition-all border border-cyber-cyan flex items-center justify-center gap-1">
+                            <i data-lucide="external-link" class="w-3.5 h-3.5"></i> <span data-i18n="btn_open">KIRISH</span>
+                        </a>
+                        <button onclick="openModal('language')" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs font-bold uppercase transition-all border border-slate-700">
+                            <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- CLI TERMINAL SECTION -->
+        <section id="terminal" class="space-y-6">
+            <div>
+                <h2 class="text-3xl font-orbitron font-bold dark:text-white text-slate-900 flex items-center gap-3">
+                    <span class="text-cyber-green">//</span> NOZIMJON CLI TERMINAL
+                </h2>
+                <p class="dark:text-slate-400 text-slate-600 text-sm mt-2" data-i18n="terminal_help">Buyruqlarni sinab ko'ring: <code class="text-cyber-cyan">whoami</code>, <code class="text-cyber-cyan">github</code>, <code class="text-cyber-cyan">projects</code>, <code class="text-cyber-cyan">skills</code>, <code class="text-cyber-cyan">clear</code></p>
+            </div>
+
+            <div class="bg-black/95 border border-cyber-green/40 rounded-lg p-5 font-mono text-xs md:text-sm shadow-2xl box-glow-cyan min-h-[320px] flex flex-col justify-between">
+                <div id="terminal-output" class="space-y-2 overflow-y-auto max-h-[250px] pr-2">
+                    <div class="text-cyber-green">CYBER TERMINAL v8.0.0 [Cursor Interactive]</div>
+                    <div class="text-slate-400" data-i18n="terminal_init">Dasturchi haqida ma'lumot olish uchun 'whoami' deb yozing.</div>
+                </div>
+                
+                <div class="flex items-center gap-2 border-t border-slate-800 pt-3 mt-4">
+                    <span class="text-cyber-green font-bold">nozimjon@senior-dev:~#</span>
+                    <input type="text" id="terminal-input" class="bg-transparent text-white focus:outline-none w-full font-mono" placeholder="Buyruqni yozing..." autofocus>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer id="contact" class="border-t border-slate-700 dark:border-slate-800 py-12 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-slate-500">
+            <div>
+                <p class="font-bold dark:text-slate-300 text-slate-800">USMONJONOV NOZIMJON (BORN 2015)</p>
+                <p>Senior Frontend Architect Portfolio © 2026</p>
+            </div>
+            <div class="flex gap-6">
+                <a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="hover:text-cyber-cyan transition-colors flex items-center gap-1">
+                    <i data-lucide="github" class="w-4 h-4"></i> GitHub
+                </a>
+                <a href="#" class="hover:text-cyber-cyan transition-colors">LinkedIn</a>
+                <a href="#" class="hover:text-cyber-cyan transition-colors">Telegram</a>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- PROJECT MODAL -->
+    <div id="modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="bg-cyber-darkcard border border-cyber-cyan max-w-xl w-full p-6 rounded-lg relative space-y-4 box-glow-cyan">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <i data-lucide="x"></i>
+            </button>
+            <h3 id="modal-title" class="text-2xl font-orbitron font-bold text-cyber-cyan"></h3>
+            <p id="modal-desc" class="text-slate-300 text-sm leading-relaxed"></p>
+            <div id="modal-tech" class="border-t border-slate-800 pt-4 text-xs text-slate-400 space-y-2"></div>
+            <button onclick="closeModal()" class="w-full py-2 bg-cyber-cyan text-black font-bold uppercase text-xs" data-i18n="btn_close">YOPISH</button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT & INTERACTIVE CURSOR LOGIC -->
+    <script>
+        lucide.createIcons();
+
+        // 1. DUMALOQ CURSOR ANIMATSIYASI LOGIKASI
+        const dot = document.getElementById('cursor-dot');
+        const ring = document.getElementById('cursor-ring');
+
+        let mouseX = 0, mouseY = 0;
+        let ringX = 0, ringY = 0;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Ichki nuqta bir zumda ergashadi
+            dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+        });
+
+        // Halqa silliq (smooth lag) bilan ergashadi
+        function renderCursor() {
+            ringX += (mouseX - ringX) * 0.15;
+            ringY += (mouseY - ringY) * 0.15;
+            
+            ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+            requestAnimationFrame(renderCursor);
+        }
+        renderCursor();
+
+        // Tugma va havolalarga borilganda kursor kattalashadi
+        document.querySelectorAll('a, button, input').forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                ring.style.width = '60px';
+                ring.style.height = '60px';
+                ring.style.borderColor = '#00F0FF';
+                ring.style.backgroundColor = 'rgba(0, 240, 255, 0.1)';
+            });
+            element.addEventListener('mouseleave', () => {
+                ring.style.width = '36px';
+                ring.style.height = '36px';
+                ring.style.borderColor = '#FF0055';
+                ring.style.backgroundColor = 'transparent';
+            });
+        });
+
+        // Sichqoncha bosilganda pulse effekti
+        window.addEventListener('mousedown', () => {
+            ring.style.transform += ' scale(0.7)';
+            dot.style.transform += ' scale(1.8)';
+        });
+
+        const i18n = {
+            uz: {
+                nav_about: "SHAXS",
+                nav_skills: "STEK",
+                nav_projects: "LOYIHALAR",
+                nav_terminal: "TERMINAL",
+                theme_light: "KUNGI",
+                theme_dark: "TUNGI",
+                hero_badge: "USMONJONOV NOZIMJON // BORN 2015",
+                hero_desc: "Frontend Senior Architect. Next.js 14, React.js, TypeScript hamda Tailwind CSS orqali murakkab, tezkor va yuqori unumdorlikka ega tizimlarni yarataman.",
+                metric_birth_label: "Tug'ilgan yili:",
+                metric_birth_value: "2015-yil",
+                metric_role_label: "Mutaxassislik:",
+                metric_stack_label: "Asosiy Stek:",
+                btn_github: "GitHub Profilim",
+                btn_projects: "Loyihalarni Ko'rish",
+                skills_title: "TEXNOLOGIK STEK",
+                skills_subtitle: "Mukammal egallangan va loyihalarda qo'llanilgan asosiy qurollarim",
+                projects_title: "YARATILGAN TIZIMLAR va LOYIHALAR",
+                projects_subtitle: "Noldan boshlab yuqori darajada qurilgan 5 ta mualliflik platformasi",
+                p1_name: "NEXUS CRM Tizimi",
+                p1_desc: "Biznes jarayonlarini avtomatlashtirish, analitika va mijozlar oqimini boshqaruvchi murakkab platforma.",
+                p2_name: "Football Booking Service",
+                p2_desc: "Futbol maydonlarini real vaqt rejimida bron qilish, onlayn vaqt va jadval tanlash servisi.",
+                p3_name: "Hotel Booking Service",
+                p3_desc: "Mehmonxona va xonalarni bron qilish hamda dinamik filtratsiya tizimiga ega interaktiv ilova.",
+                p4_name: "Car Rental Service",
+                p4_desc: "Avtomobillarni ijaraga berish, avtoparkni va tariflarni boshqaruvchi tezkor sistema.",
+                p5_name: "Al-Farg'oniy Language Center",
+                p5_desc: "O'quv markazlari uchun talabalar davomati, guruhlar hamda imtihonlarni nazorat qiluvchi LMS va rasmiy portal.",
+                btn_details: "Batafsil / Metrikalar",
+                btn_open: "KIRISH",
+                btn_close: "YOPISH",
+                terminal_help: "Buyruqlarni sinab ko'ring: whoami, github, projects, skills, clear",
+                terminal_init: "Dasturchi haqida ma'lumot olish uchun 'whoami' deb yozing."
+            },
+            ru: {
+                nav_about: "ОБ АВТОРЕ",
+                nav_skills: "СТЕК",
+                nav_projects: "ПРОЕКТЫ",
+                nav_terminal: "ТЕРМИНАЛ",
+                theme_light: "ДНЕВНОЙ",
+                theme_dark: "НОЧНОЙ",
+                hero_badge: "УСМОНЖОНОВ НОЗИМЖОН // ГОД РОЖДЕНИЯ 2015",
+                hero_desc: "Senior Frontend Архитектор. Разрабатываю сложные, высокопроизводительные системы с использованием Next.js 14, React.js, TypeScript и Tailwind CSS.",
+                metric_birth_label: "Год рождения:",
+                metric_birth_value: "2015 год",
+                metric_role_label: "Специализация:",
+                metric_stack_label: "Основной стек:",
+                btn_github: "Мой GitHub",
+                btn_projects: "Смотреть проекты",
+                skills_title: "ТЕХНОЛОГИЧЕСКИЙ СТЕК",
+                skills_subtitle: "Основные инструменты, освоенные на уровне эксперта",
+                projects_title: "РАЗРАБОТАННЫЕ СИСТЕМЫ И ПРОЕКТЫ",
+                projects_subtitle: "5 авторских платформ, построенных с нуля",
+                p1_name: "NEXUS CRM Система",
+                p1_desc: "Комплексная платформа для автоматизации бизнес-процессов, аналитики и управления клиентами.",
+                p2_name: "Football Booking Service",
+                p2_desc: "Сервис бронирования футбольных полей в реальном времени с интерактивным расписанием.",
+                p3_name: "Hotel Booking Service",
+                p3_desc: "Интерактивное приложение для бронирования отелей и номеров с динамической фильтрацией.",
+                p4_name: "Car Rental Service",
+                p4_desc: "Быстрая система для аренды автомобилей, управления автопарком и тарифами.",
+                p5_name: "Al-Farg'oniy Language Center",
+                p5_desc: "LMS система для языковых центров: посещаемость студентов, группы и контрольные тесты.",
+                btn_details: "Подробнее / Метрики",
+                btn_open: "OTKРЫТЬ",
+                btn_close: "ЗАКРЫТЬ",
+                terminal_help: "Попробуйте команды: whoami, github, projects, skills, clear",
+                terminal_init: "Введите 'whoami', чтобы получить информацию о разработчике."
+            },
+            en: {
+                nav_about: "ABOUT",
+                nav_skills: "STACK",
+                nav_projects: "PROJECTS",
+                nav_terminal: "TERMINAL",
+                theme_light: "DAY",
+                theme_dark: "NIGHT",
+                hero_badge: "USMONJONOV NOZIMJON // BORN 2015",
+                hero_desc: "Senior Frontend Architect. I build complex, fast, and scalable high-performance web platforms using Next.js 14, React.js, TypeScript, and Tailwind CSS.",
+                metric_birth_label: "Birth Year:",
+                metric_birth_value: "Year 2015",
+                metric_role_label: "Role:",
+                metric_stack_label: "Primary Stack:",
+                btn_github: "GitHub Profile",
+                btn_projects: "Explore Projects",
+                skills_title: "TECH STACK",
+                skills_subtitle: "Core production-level tools and frameworks",
+                projects_title: "BUILT SYSTEMS & PLATFORMS",
+                projects_subtitle: "5 custom enterprise-ready platforms engineered from scratch",
+                p1_name: "NEXUS CRM Engine",
+                p1_desc: "Complex enterprise platform for business process automation, analytics, and client management.",
+                p2_name: "Football Booking Hub",
+                p2_desc: "Real-time football pitch reservation portal with live slot conflict resolution.",
+                p3_name: "Hotel Booking Service",
+                p3_desc: "Interactive hotel & room reservation platform featuring dynamic filtering UI.",
+                p4_name: "Car Rental Service",
+                p4_desc: "High-speed car rental fleet management and pricing automation suite.",
+                p5_name: "Al-Farg'oniy Language Center",
+                p5_desc: "Education LMS for language academies to track student attendance, groups, and testing.",
+                btn_details: "Specs / Metrics",
+                btn_open: "LAUNCH",
+                btn_close: "CLOSE",
+                terminal_help: "Try commands: whoami, github, projects, skills, clear",
+                terminal_init: "Type 'whoami' to inspect developer details."
+            }
+        };
+
+        let currentLang = 'uz';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            ['uz', 'ru', 'en'].forEach(l => {
+                const btn = document.getElementById(`btn-${l}`);
+                if (l === lang) {
+                    btn.className = "px-2 py-1 rounded bg-cyber-cyan text-black font-bold";
+                } else {
+                    btn.className = "px-2 py-1 rounded text-slate-400 hover:text-white";
+                }
+            });
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang][key]) {
+                    el.innerText = i18n[lang][key];
+                }
+            });
+        }
+
+        // 2 SECONDS LOADER
+        window.addEventListener('DOMContentLoaded', () => {
+            const bar = document.getElementById('loader-bar');
+            const status = document.getElementById('loader-status');
+            const loader = document.getElementById('loader');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                bar.style.width = progress + '%';
+                status.innerText = `LOADING MULTI-LANG SYSTEM... ${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        loader.style.opacity = '0';
+                        setTimeout(() => loader.style.display = 'none', 500);
+                    }, 200);
+                }
+            }, 180);
+        });
+
+        // LIGHT / DARK MODE TOGGLE
+        let isDark = true;
+        function toggleTheme() {
+            isDark = !isDark;
+            const body = document.body;
+            const themeText = document.getElementById('theme-text');
+
+            if (!isDark) {
+                body.classList.remove('dark', 'bg-cyber-black', 'text-slate-200');
+                body.classList.add('light', 'bg-slate-200', 'text-slate-900');
+                themeText.innerText = i18n[currentLang].theme_dark;
+            } else {
+                body.classList.remove('light', 'bg-slate-200', 'text-slate-900');
+                body.classList.add('dark', 'bg-cyber-black', 'text-slate-200');
+                themeText.innerText = i18n[currentLang].theme_light;
+            }
+        }
+
+        // MODAL DATA
+        const projectData = {
+            crm: {
+                title: "NEXUS CRM Tizimi",
+                desc: "Biznes jarayonlarini avtomatlashtirish platformasi. Real-time chartlar va mijozlar analitikasini yuqori tezlikda qayta ishlaydi.",
+                tech: "• Next.js 14 App Router & SSR<br>• TypeScript Strict Types<br>• Tailwind CSS Responsive UI"
+            },
+            football: {
+                title: "Football Booking Service",
+                desc: "Futbol maydonlarini real vaqt rejimida bron qilish portali. Ziddiyatli band qilishlarni hal etuvchi jadval simulyatsiyasi.",
+                tech: "• React.js & TypeScript<br>• Tailwind CSS Utilities<br>• State Management Architecture"
+            },
+            hotel: {
+                title: "Hotel Booking Service",
+                desc: "Mehmonxona va xonalarni bron qilish servisi. Dynamic filtratsiya va xonalarning real vaqtdagi holatini ko'rsatish.",
+                tech: "• Next.js 14 Server Actions<br>• TypeScript Interfaces<br>• Tailwind CSS Animation Effects"
+            },
+            car: {
+                title: "Car Rental Service",
+                desc: "Avtomobillarni ijaraga berish va ularning holatini boshqarish tizimi. Kesh va optimallashtirilgan so'rovlar.",
+                tech: "• React.js & TypeScript<br>• Tailwind CSS Enterprise Layouts<br>• Dynamic Form Validation"
+            },
+            language: {
+                title: "Al-Farg'oniy Language Center Portal",
+                desc: "O'quv markazlari uchun talabalar davomati, guruhlar hamda imtihonlarni nazorat qiluvchi LMS platformasi.",
+                tech: "• Next.js 14 Layouts<br>• TypeScript Custom Types<br>• Tailwind CSS Modular Design"
+            }
+        };
+
+        function openModal(key) {
+            const data = projectData[key];
+            document.getElementById('modal-title').innerText = data.title;
+            document.getElementById('modal-desc').innerText = data.desc;
+            document.getElementById('modal-tech').innerHTML = data.tech;
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('modal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+            document.getElementById('modal').classList.remove('flex');
+        }
+
+        // TERMINAL LOGIC
+        const terminalInput = document.getElementById('terminal-input');
+        const terminalOutput = document.getElementById('terminal-output');
+
+        terminalInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const cmd = terminalInput.value.trim().toLowerCase();
+                terminalInput.value = '';
+
+                let reply = '';
+                if (cmd === 'whoami') {
+                    reply = 'Ism/Имя/Name: Usmonjonov Nozimjon<br>Tug\'ilgan yili/Год рождения/Birth Year: 2015<br>Role: Senior Frontend Architect<br>Stack: Next.js 14, React.js, TypeScript, Tailwind CSS';
+                } else if (cmd === 'github') {
+                    reply = 'GitHub Profile: <a href="https://github.com/" target="_blank" class="text-cyber-cyan underline">https://github.com/</a>';
+                } else if (cmd === 'projects') {
+                    reply = '1. NEXUS CRM Matrix<br>2. Football Booking Service<br>3. Hotel Booking Service<br>4. Car Rental Service<br>5. Al-Farg\'oniy Language Center';
+                } else if (cmd === 'skills') {
+                    reply = 'Core Stack: Next.js 14, React.js, TypeScript, Tailwind CSS, HTML5, CSS3, JavaScript (ES6+)';
+                } else if (cmd === 'clear') {
+                    terminalOutput.innerHTML = '';
+                    return;
+                } else if (cmd === 'help') {
+                    reply = 'Commands: <span class="text-cyber-cyan">whoami</span>, <span class="text-cyber-cyan">github</span>, <span class="text-cyber-cyan">projects</span>, <span class="text-cyber-cyan">skills</span>, <span class="text-cyber-cyan">clear</span>';
+                } else {
+                    reply = `<span class="text-cyber-pink">Unknown command: '${cmd}'. Type 'help'.</span>`;
+                }
+
+                terminalOutput.innerHTML += `<div><span class="text-cyber-green">nozimjon@senior-dev:~#</span> ${cmd}</div><div class="text-slate-300 pl-4 mb-2">${reply}</div>`;
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }
+        });
+
+        // MULTFILM & CYBER CANVAS ANIMATION ENGINE
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let time = 0;
+
+        class CartoonUFO {
+            constructor() {
+                this.x = -100;
+                this.y = Math.random() * (canvas.height * 0.4) + 50;
+                this.speed = Math.random() * 1.5 + 1;
+            }
+            update() {
+                this.x += this.speed;
+                if (this.x > canvas.width + 100) {
+                    this.x = -100;
+                    this.y = Math.random() * (canvas.height * 0.4) + 50;
+                }
+            }
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y + Math.sin(time * 0.05) * 15);
+                
+                ctx.beginPath();
+                ctx.moveTo(-15, 10);
+                ctx.lineTo(-30, 80);
+                ctx.lineTo(30, 80);
+                ctx.lineTo(15, 10);
+                ctx.fillStyle = 'rgba(0, 240, 255, 0.15)';
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(0, -5, 18, Math.PI, 0);
+                ctx.fillStyle = 'rgba(255, 0, 85, 0.6)';
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.ellipse(0, 5, 38, 12, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#00F0FF';
+                ctx.fill();
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                const colors = ['#FF0055', '#00FF66', '#FFCC00', '#A855F7'];
+                for (let i = -25; i <= 25; i += 16) {
+                    ctx.beginPath();
+                    ctx.arc(i, 6, 3.5, 0, Math.PI * 2);
+                    ctx.fillStyle = colors[Math.abs(i) % colors.length];
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+        }
+
+        class FlyingBear {
+            constructor() {
+                this.x = canvas.width + 100;
+                this.y = Math.random() * (canvas.height * 0.5) + 100;
+                this.speed = Math.random() * 1.2 + 0.8;
+            }
+            update() {
+                this.x -= this.speed;
+                if (this.x < -100) {
+                    this.x = canvas.width + 100;
+                    this.y = Math.random() * (canvas.height * 0.5) + 100;
+                }
+            }
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y + Math.cos(time * 0.04) * 20);
+
+                ctx.beginPath();
+                ctx.ellipse(22, 10, 8, 18, Math.PI / 4, 0, Math.PI * 2);
+                ctx.fillStyle = Math.random() > 0.5 ? '#FF0055' : '#FFCC00';
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(0, 0, 20, 0, Math.PI * 2);
+                ctx.fillStyle = '#A855F7';
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(-15, -15, 7, 0, Math.PI * 2);
+                ctx.arc(15, -15, 7, 0, Math.PI * 2);
+                ctx.fillStyle = '#FF0055';
+                ctx.fill();
+
+                ctx.fillStyle = '#00F0FF';
+                ctx.fillRect(-12, -5, 24, 8);
+
+                ctx.restore();
+            }
+        }
+
+        class CartoonStar {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 4 + 2;
+                this.color = ['#00F0FF', '#FF0055', '#00FF66', '#FFCC00', '#A855F7'][Math.floor(Math.random() * 5)];
+                this.angle = Math.random() * Math.PI;
+            }
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle + time * 0.02);
+                ctx.fillStyle = this.color;
+
+                ctx.beginPath();
+                for (let i = 0; i < 5; i++) {
+                    ctx.lineTo(Math.cos((18 + i * 72) * Math.PI / 180) * this.size, -Math.sin((18 + i * 72) * Math.PI / 180) * this.size);
+                    ctx.lineTo(Math.cos((54 + i * 72) * Math.PI / 180) * (this.size / 2), -Math.sin((54 + i * 72) * Math.PI / 180) * (this.size / 2));
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        const ufo = new CartoonUFO();
+        const bear = new FlyingBear();
+        const stars = Array.from({ length: 45 }, () => new CartoonStar());
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            time++;
+
+            stars.forEach(s => s.draw());
+
+            ufo.update();
+            ufo.draw();
+
+            bear.update();
+            bear.draw();
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
